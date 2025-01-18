@@ -306,4 +306,13 @@ h1 {
 
 .notification-banner button:hover {
     opacity: 0.9;
+}
+
+/* Add this to your CSS */
+.credits {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    font-weight: 400;
 } 
