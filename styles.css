@@ -315,4 +315,20 @@ h1 {
     color: var(--text-color);
     opacity: 0.7;
     font-weight: 400;
+}
+
+#drumToggle {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    opacity: 0.7;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    transition: opacity 0.3s ease;
+}
+
+#drumToggle:hover {
+    opacity: 1;
 } 

@@ -2,6 +2,7 @@ let timeLeft;
 let timerId = null;
 let isWorkTime = true;
 let notificationPermission = false;
+let isDrumsEnabled = false;
 
 const minutesDisplay = document.getElementById('minutes');
 const secondsDisplay = document.getElementById('seconds');
@@ -12,6 +13,8 @@ const modeText = document.getElementById('mode-text');
 const themeButton = document.getElementById('themeButton');
 const root = document.documentElement;
 const dingSound = document.getElementById('dingSound');
+const workSound = document.getElementById('workSound');
+const drumToggle = document.getElementById('drumToggle');
 
 // Check for saved theme preference or default to 'dark'
 const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -21,6 +24,7 @@ const WORK_TIME = 25 * 60; // 25 minutes in seconds
 const BREAK_TIME = 5 * 60; // 5 minutes in seconds
 
 dingSound.volume = 0.5; // Set volume to 50%
+workSound.volume = 0.3; // Adjust volume as needed
 
 toggleButton.textContent = 'Switch Mode';  // Set initial text
 
@@ -75,8 +79,8 @@ function startCountdown() {
         updateDisplay(timeLeft);
         timerId = setTimeout(startCountdown, 1000);
     } else {
-        // Play sound when timer ends
         playDing();
+        workSound.pause(); // Stop the drum loop when timer ends
         
         if (notificationPermission) {
             const message = isWorkTime ? 
@@ -104,6 +108,7 @@ function toggleMode() {
     
     if (wasRunning) {
         clearInterval(timerId);
+        workSound.pause(); // Stop the drum loop when switching modes
     }
     
     switchMode();
@@ -112,6 +117,23 @@ function toggleMode() {
     if (wasRunning) {
         startCountdown();
         startButton.textContent = 'Pause';
+        // Restart drum loop if switching to work mode
+        if (isWorkTime) {
+            workSound.currentTime = 0;
+            workSound.play().catch(error => console.log('Error playing work sound:', error));
+        }
+    }
+}
+
+function toggleDrums() {
+    isDrumsEnabled = !isDrumsEnabled;
+    drumToggle.textContent = isDrumsEnabled ? 'Drums On' : 'Drums Off';
+    
+    if (!isDrumsEnabled) {
+        workSound.pause();
+    } else if (isWorkTime && timerId !== null) {
+        // Only play if we're in a work session and the timer is running
+        workSound.play().catch(error => console.log('Error playing work sound:', error));
     }
 }
 
@@ -120,6 +142,7 @@ function startTimer() {
         clearTimeout(timerId);
         startButton.textContent = 'Start';
         timerId = null;
+        workSound.pause();
         updateModeText();
         return;
     }
@@ -128,9 +151,13 @@ function startTimer() {
         timeLeft = WORK_TIME;
     }
 
-    // Play sound when starting a new session
     if (timeLeft === WORK_TIME || timeLeft === BREAK_TIME) {
         playDing();
+        // Only play drums if enabled and in work mode
+        if (isWorkTime && isDrumsEnabled) {
+            workSound.currentTime = 0;
+            workSound.play().catch(error => console.log('Error playing work sound:', error));
+        }
     }
 
     startButton.textContent = 'Pause';
@@ -144,6 +171,7 @@ function resetTimer() {
     isWorkTime = true;
     timeLeft = WORK_TIME;
     startButton.textContent = 'Start';
+    workSound.pause(); // Stop the drum loop when resetting
     updateModeText();
     updateDisplay(timeLeft);
 }
@@ -162,6 +190,7 @@ themeButton.addEventListener('click', toggleTheme);
 startButton.addEventListener('click', startTimer);
 resetButton.addEventListener('click', resetTimer);
 toggleButton.addEventListener('click', toggleMode);
+drumToggle.addEventListener('click', toggleDrums);
 
 // Initialize the display
 timeLeft = WORK_TIME;
