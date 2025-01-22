@@ -242,10 +242,64 @@ h1 {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .mode:hover {
     background: rgba(255, 255, 255, 0.08);
+}
+
+.duration-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+.duration-setting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    justify-content: center;
+}
+
+.duration-input {
+    width: 32px;
+    background: var(--mode-bg);
+    border: none;
+    border-radius: 4px;
+    padding: 2px 4px;
+    color: var(--text-color);
+    font-size: inherit;
+    font-family: inherit;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.duration-input:hover {
+    background: var(--mode-bg);
+    opacity: 0.8;
+}
+
+.duration-input:focus {
+    background: var(--mode-bg);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Hide spinner buttons */
+.duration-input::-webkit-inner-spin-button,
+.duration-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.duration-input[type=number] {
+    -moz-appearance: textfield;
 }
 
 @media (max-width: 480px) {

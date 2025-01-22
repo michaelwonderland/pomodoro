@@ -264,55 +264,6 @@ function updateModeText() {
     }
 }
 
-// Update the CSS for the new layout
-const style = document.createElement('style');
-style.textContent = `
-    .duration-settings {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        align-items: center;
-    }
-    
-    .duration-setting {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-    
-    .duration-input {
-        width: 32px;
-        background: rgba(128, 128, 128, 0.1);
-        border: none;
-        border-radius: 4px;
-        padding: 2px 4px;
-        color: inherit;
-        font-size: inherit;
-        font-family: inherit;
-        text-align: right;
-    }
-    
-    .duration-input:hover {
-        background: rgba(128, 128, 128, 0.2);
-    }
-    
-    .duration-input:focus {
-        background: rgba(128, 128, 128, 0.3);
-        outline: none;
-    }
-    
-    /* Hide spinner buttons */
-    .duration-input::-webkit-inner-spin-button,
-    .duration-input::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    .duration-input[type=number] {
-        -moz-appearance: textfield;
-    }
-`;
-document.head.appendChild(style);
-
 // Initialize with correct text
 updateModeText();
 
