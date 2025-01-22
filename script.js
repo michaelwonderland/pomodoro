@@ -50,7 +50,6 @@ if ('Notification' in window) {
 function updateDisplay(timeLeft) {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
-    minutesDisplay.contentEditable = true; // Make minutes editable
     minutesDisplay.textContent = minutes.toString().padStart(2, '0');
     secondsDisplay.textContent = seconds.toString().padStart(2, '0');
 }
@@ -216,44 +215,65 @@ function updateModeText() {
     } else if (isPaused) {
         modeText.textContent = isWorkTime ? 'Resume Session - Work' : 'Resume Session - Rest';
     } else if (isReset) {
-        // Add input field when timer is reset
-        const currentDuration = isWorkTime ? WORK_TIME / 60 : BREAK_TIME / 60;
+        const workDuration = WORK_TIME / 60;
+        const breakDuration = BREAK_TIME / 60;
         modeText.innerHTML = `
-            <div class="duration-setting">
-                <input type="number" 
-                    min="1" 
-                    max="99" 
-                    value="${currentDuration}" 
-                    class="duration-input"
-                > :00 minutes - ${isWorkTime ? 'Work' : 'Rest'}
+            <div class="duration-settings">
+                <div class="duration-setting">
+                    Set Work time - 
+                    <input type="number" 
+                        min="1" 
+                        max="99" 
+                        value="${workDuration}" 
+                        class="duration-input"
+                        data-mode="work"
+                    >:00
+                </div>
+                <div class="duration-setting">
+                    Set Rest time - 
+                    <input type="number" 
+                        min="1" 
+                        max="99" 
+                        value="${breakDuration}" 
+                        class="duration-input"
+                        data-mode="rest"
+                    >:00
+                </div>
             </div>
         `;
         
-        // Add event listener to the new input
-        const input = modeText.querySelector('.duration-input');
-        if (input) {
+        // Add event listeners to both inputs
+        const inputs = modeText.querySelectorAll('.duration-input');
+        inputs.forEach(input => {
             input.addEventListener('change', function() {
-                let value = parseInt(this.value) || 25;
+                let value = parseInt(this.value) || (this.dataset.mode === 'work' ? 25 : 5);
                 if (value < 1) value = 1;
                 if (value > 99) value = 99;
                 this.value = value;
                 
-                if (isWorkTime) {
+                if (this.dataset.mode === 'work') {
                     WORK_TIME = value * 60;
-                    timeLeft = WORK_TIME;
+                    if (isWorkTime) timeLeft = WORK_TIME;
                 } else {
                     BREAK_TIME = value * 60;
-                    timeLeft = BREAK_TIME;
+                    if (!isWorkTime) timeLeft = BREAK_TIME;
                 }
                 updateDisplay(timeLeft);
             });
-        }
+        });
     }
 }
 
-// Add CSS for the duration input
+// Update the CSS for the new layout
 const style = document.createElement('style');
 style.textContent = `
+    .duration-settings {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+    
     .duration-setting {
         display: inline-flex;
         align-items: center;
@@ -261,7 +281,7 @@ style.textContent = `
     }
     
     .duration-input {
-        width: 40px;
+        width: 32px;
         background: rgba(128, 128, 128, 0.1);
         border: none;
         border-radius: 4px;
@@ -317,74 +337,4 @@ function setupSmoothLoop() {
 }
 
 // Call this when the page loads
-setupSmoothLoop();
-
-// Add input validation and handling
-minutesDisplay.addEventListener('input', function(e) {
-    let value = this.textContent.replace(/[^0-9]/g, ''); // Only allow numbers
-    
-    // Limit to 2 digits and reasonable time (1-99 minutes)
-    if (value.length > 2) value = value.slice(0, 2);
-    if (value === '') value = '25';
-    if (parseInt(value) < 1) value = '01';
-    if (parseInt(value) > 99) value = '99';
-    
-    this.textContent = value.padStart(2, '0');
-    
-    // Update the appropriate timer duration based on current mode
-    const minutes = parseInt(value);
-    if (isWorkTime) {
-        WORK_TIME = minutes * 60;
-        if (timeLeft === WORK_TIME || !timerId) timeLeft = WORK_TIME;
-    } else {
-        BREAK_TIME = minutes * 60;
-        if (timeLeft === BREAK_TIME || !timerId) timeLeft = BREAK_TIME;
-    }
-});
-
-// Prevent unwanted keystrokes
-minutesDisplay.addEventListener('keydown', function(e) {
-    // Allow: backspace, delete, tab, numbers, arrows
-    if (!((e.keyCode >= 48 && e.keyCode <= 57) || // numbers
-          (e.keyCode >= 96 && e.keyCode <= 105) || // numpad
-          e.keyCode === 8 || // backspace
-          e.keyCode === 9 || // tab
-          e.keyCode === 46 || // delete
-          e.keyCode === 37 || // left arrow
-          e.keyCode === 39)) { // right arrow
-        e.preventDefault();
-    }
-});
-
-// Update minutes display when losing focus
-minutesDisplay.addEventListener('blur', function() {
-    this.style.backgroundColor = 'transparent';
-    this.style.padding = '0';
-    this.textContent = this.textContent.padStart(2, '0');
-});
-
-// Add this after the existing minutesDisplay event listeners
-minutesDisplay.addEventListener('mouseover', function() {
-    this.style.backgroundColor = 'rgba(128, 128, 128, 0.1)';  // Subtle background
-    this.style.cursor = 'text';  // Show text cursor
-    this.title = 'Click to edit minutes';  // Tooltip
-});
-
-minutesDisplay.addEventListener('mouseout', function() {
-    if (document.activeElement !== this) {  // Only remove background if not focused
-        this.style.backgroundColor = 'transparent';
-    }
-});
-
-minutesDisplay.addEventListener('focus', function() {
-    this.style.backgroundColor = 'rgba(128, 128, 128, 0.2)';  // Slightly darker when focused
-    this.style.outline = 'none';  // Remove default focus outline
-    this.style.borderRadius = '4px';  // Rounded corners
-    this.style.padding = '0 4px';  // Small padding
-});
-
-minutesDisplay.addEventListener('blur', function() {
-    this.style.backgroundColor = 'transparent';
-    this.style.padding = '0';
-    this.textContent = this.textContent.padStart(2, '0');  // Keep the existing padding behavior
-}); 
+setupSmoothLoop(); 
