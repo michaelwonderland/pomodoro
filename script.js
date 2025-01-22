@@ -107,13 +107,13 @@ function startCountdown() {
             });
         }
 
-        if (isWorkTime) {
-            modeText.textContent = "Work session complete! Take a break?";
-        } else {
-            modeText.textContent = "Break time over! Ready to focus?";
-        }
+        // Switch modes and reset timer when session ends
+        isWorkTime = !isWorkTime;
+        timeLeft = isWorkTime ? WORK_TIME : BREAK_TIME;
         startButton.textContent = "Start";
         timerId = null;
+        updateDisplay(timeLeft);
+        updateModeText();
     }
 }
 
