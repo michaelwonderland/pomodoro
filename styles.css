@@ -416,7 +416,7 @@ h1 {
         margin: 0;
         padding: 0.5rem 1rem;
         border-radius: 0;
-        background: var(--container-bg);
+        background: var(--container-bg) !important;
         backdrop-filter: none;
         border: none;
         box-shadow: none;
@@ -467,5 +467,9 @@ h1 {
 
     .notification-banner {
         display: none;
+    }
+
+    [data-theme="dark"] .container {
+        background: rgba(15, 23, 42, 0.95) !important;
     }
 } 
