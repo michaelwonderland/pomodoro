@@ -26,7 +26,9 @@ let BREAK_TIME = 5 * 60; // 5 minutes in seconds
 dingSound.volume = 0.5; // Set volume to 50%
 workSound.volume = 0.2;  // Set drums to 20%
 
-workSound.load(); // Ensure the audio is loaded
+// First, let's update the audio source
+workSound.src = 'lo-fi-drum-break-her_82bpm.wav';
+workSound.load(); // Reload the audio with new source
 
 toggleButton.textContent = 'Switch Mode';  // Set initial text
 
