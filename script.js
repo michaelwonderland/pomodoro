@@ -52,8 +52,18 @@ if ('Notification' in window) {
 function updateDisplay(timeLeft) {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
+    const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Update the timer display
     minutesDisplay.textContent = minutes.toString().padStart(2, '0');
     secondsDisplay.textContent = seconds.toString().padStart(2, '0');
+    
+    // Update the document title
+    if (timerId !== null) { // Only show time in title when timer is running
+        document.title = `${timeString} - Pomodoro Timer - ML Wonderland`;
+    } else {
+        document.title = 'Pomodoro Timer - ML Wonderland';
+    }
 }
 
 function switchMode() {
