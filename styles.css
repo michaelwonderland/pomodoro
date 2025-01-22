@@ -471,8 +471,4 @@ h1 {
     .notification-banner {
         display: none;
     }
-
-    [data-theme="dark"] .container {
-        background: rgba(255, 255, 255, 0.05) !important;
-    }
 } 
