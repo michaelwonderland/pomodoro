@@ -282,6 +282,8 @@ h1 {
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .duration-input:hover {
@@ -295,6 +297,13 @@ h1 {
     background: var(--mode-bg);
     outline: none;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+    color: transparent;
+    text-shadow: 0 0 0 var(--text-color);
+}
+
+.duration-input:not(:focus) {
+    color: var(--text-color);
+    text-shadow: none;
 }
 
 /* Hide spinner buttons */
@@ -304,77 +313,10 @@ h1 {
     margin: 0;
 }
 
+/* Firefox number input styling */
 .duration-input[type=number] {
-    -moz-appearance: textfield;
-}
-
-/* Mobile styles */
-@media (max-width: 480px) {
-    body {
-        position: fixed;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        background: var(--bg-gradient);
-    }
-
-    .container {
-        width: 100%;
-        height: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 2rem 1rem;
-        border-radius: 0;
-        background: var(--container-bg);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        overflow-y: auto;
-        border: none;
-    }
-
-    .container::before {
-        display: none;
-    }
-
-    body::before {
-        opacity: 0.5;
-    }
-
-    .logo {
-        width: 50px;
-        margin-bottom: 0.5rem;
-    }
-
-    h1 {
-        font-size: 1.4rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .timer {
-        font-size: 3.8rem;
-        margin: 0.5rem 0;
-    }
-    
-    .controls {
-        gap: 6px;
-        margin: 0.6rem 0;
-        padding: 0;
-    }
-
-    .mode {
-        margin-top: 0.6rem;
-        padding: 0.6rem;
-    }
-
-    .duration-settings {
-        gap: 6px;
-    }
-
-    .notification-banner {
-        display: none;
-    }
+    appearance: textfield;
+    -webkit-appearance: textfield;
 }
 
 /* Add logo styles */
@@ -422,15 +364,6 @@ h1 {
     white-space: nowrap;
 }
 
-@media (max-width: 480px) {
-    .notification-banner {
-        position: absolute;
-        flex-direction: column;
-        padding: 10px;
-        gap: 8px;
-    }
-}
-
 /* Add this to your CSS */
 .credits {
     margin-top: 0.5rem;
@@ -454,4 +387,13 @@ h1 {
 
 #drumToggle:hover {
     opacity: 1;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 } 

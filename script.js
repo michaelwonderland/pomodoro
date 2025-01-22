@@ -239,6 +239,10 @@ function updateModeText() {
                         value="${workDuration}" 
                         class="duration-input"
                         data-mode="work"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocomplete="off"
+                        step="1"
                     >:00
                 </div>
                 <div class="duration-setting">
@@ -249,6 +253,10 @@ function updateModeText() {
                         value="${breakDuration}" 
                         class="duration-input"
                         data-mode="rest"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocomplete="off"
+                        step="1"
                     >:00
                 </div>
             </div>
@@ -257,6 +265,15 @@ function updateModeText() {
         // Add event listeners to both inputs
         const inputs = modeText.querySelectorAll('.duration-input');
         inputs.forEach(input => {
+            input.setAttribute('inputmode', 'numeric');
+            input.setAttribute('pattern', '[0-9]*');
+            
+            // Clear value on focus
+            input.addEventListener('focus', function() {
+                this.value = '';
+            });
+            
+            // Handle input changes
             input.addEventListener('change', function() {
                 let value = parseInt(this.value) || (this.dataset.mode === 'work' ? 25 : 5);
                 if (value < 1) value = 1;
@@ -271,6 +288,7 @@ function updateModeText() {
                     if (!isWorkTime) timeLeft = BREAK_TIME;
                 }
                 updateDisplay(timeLeft);
+                this.blur(); // Remove focus after value is set
             });
         });
     }
