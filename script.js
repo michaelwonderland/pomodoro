@@ -220,4 +220,18 @@ function updateModeText() {
 }
 
 // Initialize with correct text
-updateModeText(); 
+updateModeText();
+
+// Add this function near your other audio-related code
+function setupSmoothLoop() {
+    workSound.addEventListener('timeupdate', function() {
+        // Start playing the next loop slightly before the current one ends
+        // Adjust the 0.2 value to find the sweet spot for your audio file
+        if (workSound.currentTime > workSound.duration - 0.2) {
+            workSound.currentTime = 0;
+        }
+    });
+}
+
+// Call this when the page loads
+setupSmoothLoop(); 
