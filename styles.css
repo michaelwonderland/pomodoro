@@ -434,6 +434,9 @@ h1 {
     .logo {
         width: 80px;
         margin-bottom: 0.5rem;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
     }
 
     h1 {
@@ -470,6 +473,6 @@ h1 {
     }
 
     [data-theme="dark"] .container {
-        background: rgba(15, 23, 42, 0.95) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
     }
 } 
