@@ -20,8 +20,8 @@ const drumToggle = document.getElementById('drumToggle');
 const savedTheme = localStorage.getItem('theme') || 'dark';
 root.setAttribute('data-theme', savedTheme);
 
-const WORK_TIME = 25 * 60; // 25 minutes in seconds
-const BREAK_TIME = 5 * 60; // 5 minutes in seconds
+let WORK_TIME = 25 * 60; // 25 minutes in seconds
+let BREAK_TIME = 5 * 60; // 5 minutes in seconds
 
 dingSound.volume = 0.5; // Set volume to 50%
 workSound.volume = 0.2;  // Set drums to 20%
@@ -50,13 +50,14 @@ if ('Notification' in window) {
 function updateDisplay(timeLeft) {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
+    minutesDisplay.contentEditable = true; // Make minutes editable
     minutesDisplay.textContent = minutes.toString().padStart(2, '0');
     secondsDisplay.textContent = seconds.toString().padStart(2, '0');
 }
 
 function switchMode() {
     isWorkTime = !isWorkTime;
-    timeLeft = isWorkTime ? WORK_TIME : BREAK_TIME;
+    timeLeft = isWorkTime ? WORK_TIME : BREAK_TIME; // This will use current values
     updateDisplay(timeLeft);
     updateModeText();
 }
@@ -178,9 +179,9 @@ function resetTimer() {
     clearInterval(timerId);
     timerId = null;
     isWorkTime = true;
-    timeLeft = WORK_TIME;
+    timeLeft = WORK_TIME; // This will now use the current WORK_TIME value
     startButton.textContent = 'Start';
-    workSound.pause(); // Stop the drum loop when resetting
+    workSound.pause();
     updateModeText();
     updateDisplay(timeLeft);
 }
@@ -227,19 +228,84 @@ function setupSmoothLoop() {
     workSound.load();
     
     workSound.addEventListener('timeupdate', function() {
-        if (workSound.currentTime > workSound.duration - 0.3) {
-            const fadeOut = setInterval(() => {
-                if (workSound.volume > 0.05) {
-                    workSound.volume -= 0.05;
-                } else {
-                    clearInterval(fadeOut);
-                    workSound.currentTime = 0;
-                    workSound.volume = 0.2;  // Reset to 20%
-                }
-            }, 20);
+        // Start transition earlier (0.5 seconds before end) for smoother overlap
+        if (workSound.currentTime > workSound.duration - 0.5) {
+            // Reset immediately without fade
+            workSound.currentTime = 0;
+            workSound.volume = 0.2;  // Maintain consistent volume
         }
     });
 }
 
 // Call this when the page loads
-setupSmoothLoop(); 
+setupSmoothLoop();
+
+// Add input validation and handling
+minutesDisplay.addEventListener('input', function(e) {
+    let value = this.textContent.replace(/[^0-9]/g, ''); // Only allow numbers
+    
+    // Limit to 2 digits and reasonable time (1-99 minutes)
+    if (value.length > 2) value = value.slice(0, 2);
+    if (value === '') value = '25';
+    if (parseInt(value) < 1) value = '01';
+    if (parseInt(value) > 99) value = '99';
+    
+    this.textContent = value.padStart(2, '0');
+    
+    // Update the appropriate timer duration based on current mode
+    const minutes = parseInt(value);
+    if (isWorkTime) {
+        WORK_TIME = minutes * 60;
+        if (timeLeft === WORK_TIME || !timerId) timeLeft = WORK_TIME;
+    } else {
+        BREAK_TIME = minutes * 60;
+        if (timeLeft === BREAK_TIME || !timerId) timeLeft = BREAK_TIME;
+    }
+});
+
+// Prevent unwanted keystrokes
+minutesDisplay.addEventListener('keydown', function(e) {
+    // Allow: backspace, delete, tab, numbers, arrows
+    if (!((e.keyCode >= 48 && e.keyCode <= 57) || // numbers
+          (e.keyCode >= 96 && e.keyCode <= 105) || // numpad
+          e.keyCode === 8 || // backspace
+          e.keyCode === 9 || // tab
+          e.keyCode === 46 || // delete
+          e.keyCode === 37 || // left arrow
+          e.keyCode === 39)) { // right arrow
+        e.preventDefault();
+    }
+});
+
+// Update minutes display when losing focus
+minutesDisplay.addEventListener('blur', function() {
+    this.style.backgroundColor = 'transparent';
+    this.style.padding = '0';
+    this.textContent = this.textContent.padStart(2, '0');
+});
+
+// Add this after the existing minutesDisplay event listeners
+minutesDisplay.addEventListener('mouseover', function() {
+    this.style.backgroundColor = 'rgba(128, 128, 128, 0.1)';  // Subtle background
+    this.style.cursor = 'text';  // Show text cursor
+    this.title = 'Click to edit minutes';  // Tooltip
+});
+
+minutesDisplay.addEventListener('mouseout', function() {
+    if (document.activeElement !== this) {  // Only remove background if not focused
+        this.style.backgroundColor = 'transparent';
+    }
+});
+
+minutesDisplay.addEventListener('focus', function() {
+    this.style.backgroundColor = 'rgba(128, 128, 128, 0.2)';  // Slightly darker when focused
+    this.style.outline = 'none';  // Remove default focus outline
+    this.style.borderRadius = '4px';  // Rounded corners
+    this.style.padding = '0 4px';  // Small padding
+});
+
+minutesDisplay.addEventListener('blur', function() {
+    this.style.backgroundColor = 'transparent';
+    this.style.padding = '0';
+    this.textContent = this.textContent.padStart(2, '0');  // Keep the existing padding behavior
+}); 
