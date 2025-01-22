@@ -216,9 +216,82 @@ function updateModeText() {
     } else if (isPaused) {
         modeText.textContent = isWorkTime ? 'Resume Session - Work' : 'Resume Session - Rest';
     } else if (isReset) {
-        modeText.textContent = isWorkTime ? 'Start a Session - Work' : 'Start a Session - Rest';
+        // Add input field when timer is reset
+        const currentDuration = isWorkTime ? WORK_TIME / 60 : BREAK_TIME / 60;
+        modeText.innerHTML = `
+            <div class="duration-setting">
+                <input type="number" 
+                    min="1" 
+                    max="99" 
+                    value="${currentDuration}" 
+                    class="duration-input"
+                > :00 minutes - ${isWorkTime ? 'Work' : 'Rest'}
+            </div>
+        `;
+        
+        // Add event listener to the new input
+        const input = modeText.querySelector('.duration-input');
+        if (input) {
+            input.addEventListener('change', function() {
+                let value = parseInt(this.value) || 25;
+                if (value < 1) value = 1;
+                if (value > 99) value = 99;
+                this.value = value;
+                
+                if (isWorkTime) {
+                    WORK_TIME = value * 60;
+                    timeLeft = WORK_TIME;
+                } else {
+                    BREAK_TIME = value * 60;
+                    timeLeft = BREAK_TIME;
+                }
+                updateDisplay(timeLeft);
+            });
+        }
     }
 }
+
+// Add CSS for the duration input
+const style = document.createElement('style');
+style.textContent = `
+    .duration-setting {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .duration-input {
+        width: 40px;
+        background: rgba(128, 128, 128, 0.1);
+        border: none;
+        border-radius: 4px;
+        padding: 2px 4px;
+        color: inherit;
+        font-size: inherit;
+        font-family: inherit;
+        text-align: right;
+    }
+    
+    .duration-input:hover {
+        background: rgba(128, 128, 128, 0.2);
+    }
+    
+    .duration-input:focus {
+        background: rgba(128, 128, 128, 0.3);
+        outline: none;
+    }
+    
+    /* Hide spinner buttons */
+    .duration-input::-webkit-inner-spin-button,
+    .duration-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .duration-input[type=number] {
+        -moz-appearance: textfield;
+    }
+`;
+document.head.appendChild(style);
 
 // Initialize with correct text
 updateModeText();
@@ -228,11 +301,17 @@ function setupSmoothLoop() {
     workSound.load();
     
     workSound.addEventListener('timeupdate', function() {
-        // Start transition earlier (0.5 seconds before end) for smoother overlap
-        if (workSound.currentTime > workSound.duration - 0.5) {
-            // Reset immediately without fade
-            workSound.currentTime = 0;
-            workSound.volume = 0.2;  // Maintain consistent volume
+        // Start transition earlier (0.3 seconds before end) for smoother overlap
+        if (workSound.currentTime > workSound.duration - 0.3) {
+            const fadeOut = setInterval(() => {
+                if (workSound.volume > 0.05) {
+                    workSound.volume -= 0.05;
+                } else {
+                    clearInterval(fadeOut);
+                    workSound.currentTime = 0;
+                    workSound.volume = 0.2;  // Reset to 20%
+                }
+            }, 20);
         }
     });
 }
