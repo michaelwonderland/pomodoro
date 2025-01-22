@@ -24,7 +24,7 @@ const WORK_TIME = 25 * 60; // 25 minutes in seconds
 const BREAK_TIME = 5 * 60; // 5 minutes in seconds
 
 dingSound.volume = 0.5; // Set volume to 50%
-workSound.volume = 0.3; // Adjust volume as needed
+workSound.volume = 0.2;  // Set drums to 20%
 
 workSound.load(); // Ensure the audio is loaded
 
@@ -222,13 +222,21 @@ function updateModeText() {
 // Initialize with correct text
 updateModeText();
 
-// Add this function near your other audio-related code
+// Update the setupSmoothLoop function
 function setupSmoothLoop() {
+    workSound.load();
+    
     workSound.addEventListener('timeupdate', function() {
-        // Start playing the next loop slightly before the current one ends
-        // Adjust the 0.2 value to find the sweet spot for your audio file
-        if (workSound.currentTime > workSound.duration - 0.2) {
-            workSound.currentTime = 0;
+        if (workSound.currentTime > workSound.duration - 0.3) {
+            const fadeOut = setInterval(() => {
+                if (workSound.volume > 0.05) {
+                    workSound.volume -= 0.05;
+                } else {
+                    clearInterval(fadeOut);
+                    workSound.currentTime = 0;
+                    workSound.volume = 0.2;  // Reset to 20%
+                }
+            }, 20);
         }
     });
 }
