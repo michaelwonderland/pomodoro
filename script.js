@@ -26,6 +26,8 @@ const BREAK_TIME = 5 * 60; // 5 minutes in seconds
 dingSound.volume = 0.5; // Set volume to 50%
 workSound.volume = 0.3; // Adjust volume as needed
 
+workSound.load(); // Ensure the audio is loaded
+
 toggleButton.textContent = 'Switch Mode';  // Set initial text
 
 document.getElementById('enable-notifications').addEventListener('click', async () => {
@@ -139,11 +141,11 @@ function toggleDrums() {
 
 function startTimer() {
     if (timerId !== null) {
+        // Pausing the timer
         clearTimeout(timerId);
         startButton.textContent = 'Start';
         timerId = null;
         workSound.pause();
-        console.log('Timer paused, drums stopped');
         updateModeText();
         return;
     }
@@ -152,17 +154,18 @@ function startTimer() {
         timeLeft = WORK_TIME;
     }
 
-    if (timeLeft === WORK_TIME || timeLeft === BREAK_TIME) {
+    // Starting a new session
+    if (timeLeft === WORK_TIME) {
         playDing();
-        // Only play drums if enabled and in work mode
+        // Only play drums if it's a work session start AND drums are enabled
         if (isWorkTime && isDrumsEnabled) {
             workSound.currentTime = 0;
-            console.log('Attempting to play drums...');
-            workSound.play().catch(error => {
-                console.log('Error playing work sound:', error);
-            }).then(() => {
-                console.log('Drums started successfully');
-            });
+            const playPromise = workSound.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error('Error playing drums:', error);
+                });
+            }
         }
     }
 
