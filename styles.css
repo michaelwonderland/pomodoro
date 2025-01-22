@@ -315,6 +315,7 @@ h1 {
         width: 100vw;
         height: 100vh;
         overflow: hidden;
+        background: var(--bg-gradient);
     }
 
     .container {
@@ -331,6 +332,10 @@ h1 {
         align-items: center;
         justify-content: center;
         overflow-y: auto;
+    }
+
+    .container::before {
+        border-radius: 0;
     }
 
     .logo {
