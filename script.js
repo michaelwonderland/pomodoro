@@ -2,7 +2,7 @@ let timeLeft;
 let timerId = null;
 let isWorkTime = true;
 let notificationPermission = false;
-let isDrumsEnabled = false;
+let isDrumsEnabled = true;
 
 const minutesDisplay = document.getElementById('minutes');
 const secondsDisplay = document.getElementById('seconds');
@@ -143,6 +143,7 @@ function startTimer() {
         startButton.textContent = 'Start';
         timerId = null;
         workSound.pause();
+        console.log('Timer paused, drums stopped');
         updateModeText();
         return;
     }
@@ -156,7 +157,12 @@ function startTimer() {
         // Only play drums if enabled and in work mode
         if (isWorkTime && isDrumsEnabled) {
             workSound.currentTime = 0;
-            workSound.play().catch(error => console.log('Error playing work sound:', error));
+            console.log('Attempting to play drums...');
+            workSound.play().catch(error => {
+                console.log('Error playing work sound:', error);
+            }).then(() => {
+                console.log('Drums started successfully');
+            });
         }
     }
 
